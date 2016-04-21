@@ -1,0 +1,170 @@
+byte[][] ciphertext = new byte[m][BLOCK_SIZE];
+        byte[] tweak = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+        byte[] key1 = new byte[BLOCK_SIZE];
+        byte[] key2 = new byte[BLOCK_SIZE];
+
+
+        AES aes = new AES();
+        byte[] init = aes.AESencription(key2, tweak);
+        byte[] additional = new byte[BLOCK_SIZE];
+
+        for (int i=0; i<m; i++) {
+            //kalo m cuma 1
+            if (m==1) {
+                //xor1
+                byte[] xor1 = new byte[BLOCK_SIZE];
+                for (int j=0; j<BLOCK_SIZE; j++) {
+                    xor1[j] = (byte)(init[j] ^ plaintext.get(i)[j]);
+                }
+
+                //enkrip1
+                byte[] enkrip1 = aes.AESencription(key1, xor1);
+
+                //xor2
+                for (int j=0; j<BLOCK_SIZE; j++) {
+                    ciphertext[i][j] = (byte)(init[j] ^ enkrip1[j]);
+                }
+            }
+            //sebelum m-2
+            else if (i<m-2) {
+                //xor1
+                byte[] xor1 = new byte[BLOCK_SIZE];
+                for (int j=0; j<BLOCK_SIZE; j++) {
+                    xor1[j] = (byte)(init[j] ^ plaintext.get(i)[j]);
+                }
+
+                //enkrip1
+                byte[] enkrip1 = aes.AESencription(key1, xor1);
+
+                //xor2
+                for (int j=0; j<BLOCK_SIZE; j++) {
+                    ciphertext[i][j] = (byte)(init[j] ^ enkrip1[j]);
+                }
+                init = multiplication(init);
+            }
+            //handling m-2
+            else {
+                if (last != 0) {
+                    for (int j=m-2; j<m; j++) {
+                        //m-1 handling
+                        //dua terakhir dari belakang
+                        if (j != m-1){
+                            //xor1
+                            byte[] xor1 = new byte[BLOCK_SIZE];
+                            for (int k=0; k<BLOCK_SIZE; k++) {
+                                xor1[k] = (byte)(init[k] ^ plaintext.get(m-2)[k]);
+                            }
+
+                            //enkrip1
+                            byte[] enkrip1 = aes.AESencription(key1, xor1);
+
+                            //                //xor2
+                            //                for (int j=0; j<BLOCK_SIZE; j++) {
+                            //                    ccTemp.get(i)[j] = (byte)(init[j] ^ enkrip1);
+                            //                }
+
+                            //assign last value of cipher
+                            for (int k=0; k<last; k++) {
+                                ciphertext[j+1][k] = (byte)(init[k] ^ enkrip1[k]);
+                            }
+
+                            //assign additional plaintext
+                            for (int k=last-1; k<BLOCK_SIZE; k++) {
+                                additional[k] = (byte)(init[k] ^ enkrip1[k]);
+                            }
+
+                            init = multiplication(init);
+                        }
+                        //m handling
+                        else {
+                            //xor1
+                            byte[] xor1 = new byte[BLOCK_SIZE];
+                            for (int k=0; k<BLOCK_SIZE; k++) {
+                                if (k < last) {
+                                    xor1[k] = (byte)(init[k] ^ plaintext.get(m-1)[k]);
+                                }
+
+                                else {
+                                    xor1[k] = (byte)(init[k] ^ additional[k]);
+                                }
+                            }
+
+                            //enkrip1
+                            byte[] enkrip1 = aes.AESencription(key1, xor1);
+
+                            //xor2
+                            for (int k=0; k<BLOCK_SIZE; k++) {
+                                ciphertext[m-2][k] = (byte)(init[k] ^ enkrip1[k]);
+                            }
+                        }
+                    }
+                }
+                else {
+                    //xor1
+                    byte[] xor1 = new byte[BLOCK_SIZE];
+                    for (int j=0; j<BLOCK_SIZE; j++) {
+                        xor1[j] = (byte)(init[j] ^ plaintext.get(i)[j]);
+                    }
+
+                    //enkrip1
+                    byte[] enkrip1 = aes.AESencription(key1, xor1);
+
+                    //xor2
+                    for (int j=0; j<BLOCK_SIZE; j++) {
+                        ciphertext[i][j] = (byte)(init[j] ^ enkrip1[j]);
+                    }
+                    if (i!=m-1) {
+                        init = multiplication(init);
+                    }
+                }
+            }
+        }
+
+        System.out.println("--------PRINT CIPHERTEXT--------");
+
+        for(int p=0; p<ciphertext.length; p++) {
+            System.out.print("CT ke-"+p+": ");
+            printByte(ciphertext[p]);
+        }
+
+
+        ////////////////////////////////////////
+
+
+        //        byte[] baca = new byte[BLOCK_SIZE];
+        //        ArrayList<byte[]> plaintext = new ArrayList<>();
+        //        FileInputStream reader1 = new FileInputStream("res/plaintext.txt");
+        //
+        //        int length = 1;
+        //        int last = 0;
+        //        int m = 0;
+        //
+        //        System.out.println("--------PRINT PLAINTEXT--------");
+        //        length = reader1.read(baca);
+        //        while(length > 0) {
+        //            if (length < BLOCK_SIZE){
+        //                last = length;
+        //            }
+        //            plaintext.add(Arrays.copyOf(baca, baca.length));
+        //            m++;
+        //            System.out.print("PT ke-"+m+": ");
+        //             printByte(plaintext.get(m-1));
+        //            length = reader1.read(baca);
+        //            System.out.println("last: "+last);
+        //            System.out.println("m: "+m);
+        //        }
+        //
+        //        System.out.println("--------PRINT KEY--------");
+        //        byte[][] key = new byte[2][BLOCK_SIZE];
+        //        FileInputStream reader2 = new FileInputStream("res/key.txt");
+        //        reader2.read(baca);
+        //        key[0] = (Arrays.copyOf(baca, baca.length));
+        //        System.out.print("key1: ");
+        //        printByte(key[0]);
+        //        reader2.read(baca);
+        //        key[1] = (Arrays.copyOf(baca, baca.length));
+        //        System.out.print("key2: ");
+        //        printByte(key[1]);
+        //
+        //        XTS_AES xts_aes = new XTS_AES();
+        //        xts_aes.encryption(plaintext,key,last);
