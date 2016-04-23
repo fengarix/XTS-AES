@@ -1,0 +1,43 @@
+<html><head>
+  <SCRIPT src="http://java.com/js/dtjava.js"></SCRIPT>
+<script>
+    function launchApplication(jnlpfile) {
+        dtjava.launch(            {
+                url : 'XTS_AES.jnlp'
+            },
+            {
+                javafx : '8.0+'
+            },
+            {}
+        );
+        return false;
+    }
+</script>
+
+<script>
+    function javafxEmbed_XTS_AES_id() {
+        dtjava.embed(
+            {
+                id : 'XTS_AES_id',
+                url : 'XTS_AES.jnlp',
+                placeholder : 'javafx-app-placeholder',
+                width : 600,
+                height : 400
+            },
+            {
+                javafx : '8.0+'
+            },
+            {}
+        );
+    }
+    <!-- Embed FX application into web page once page is loaded -->
+    dtjava.addOnloadCallback(javafxEmbed_XTS_AES_id);
+</script>
+
+</head><body>
+<h2>Test page for <b>XTS-AES</b></h2>
+  <b>Webstart:</b> <a href='XTS_AES.jnlp' onclick="return launchApplication('XTS_AES.jnlp');">click to launch this app as webstart</a><br><hr><br>
+
+  <!-- Applet will be inserted here -->
+  <div id='javafx-app-placeholder'></div>
+</body></html>

@@ -112,7 +112,6 @@ public class XTS_AES {
                     }
                 }
             }
-            System.out.println("asd");
         }
 
         System.out.println("--------PRINT CIPHERTEXT--------");
